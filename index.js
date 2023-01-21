@@ -6,12 +6,12 @@ dotenv.config();
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
-const port = 3000;
+const port = process.env.PORT;
 
 const generationQueue = [];
 
 // Create the initial StoryNode, which acts as a menu for selecting different stories
-const initialStoryNode = new StoryNode('Welcome to the AI CYOA storyteller. Please select a story to begin.', 'Home', ['Land of a Thousand Suns', 'Boston Nights', 'God of War', 'The Heist of the Vault of Steel']);
+const initialStoryNode = new StoryNode('Welcome to the AI CYOA storyteller. Please select a story to begin.', 'Home', ['Land of a Thousand Suns', 'Boston Nights', 'The Last Dance', 'Time Keeper', 'Journey to Atlantis', 'Kitchen Mayhem']);
 initialStoryNode.storySummary = initialStoryNode.story;
 
 // Generate the stylesheet for the page
