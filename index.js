@@ -7,6 +7,7 @@ dotenv.config();
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 const port = process.env.PORT;
+const debugging = process.env.DEBUGGING;
 
 const generationQueue = [];
 
@@ -23,7 +24,10 @@ function generatePageCssTag() {
             justify-content: center;
         }
         .container {
-            width: 50%;
+            /* do not do this, it is not responsive on mobile: width: 50%; */
+            width: 100%;
+            max-width: 800px;
+            padding: 10px;
         }
     </style>`;
 }
@@ -63,11 +67,13 @@ function renderStoryNode(storyNode) {
         response += `<br><a href="/">Go home</a>`;
     }
     // Add a debugging section at the bottom that shows the id of the story node and the story summary if it exists
-    response += `<br><br><h2>Debugging</h2>`;
-    response += `<p>Story ID: ${storyNode.id}</p>`;
-    if (storyNode.storySummary) {
-        // Replace newlines with <br> tags so that the story summary is displayed correctly
-        response += `<p>Story Summary:<br>${storyNode.storySummary.replace(/\n/g, '<br>')}</p>`;
+    if (debugging) {
+        response += `<br><br><h2>Debugging</h2>`;
+        response += `<p>Story ID: ${storyNode.id}</p>`;
+        if (storyNode.storySummary) {
+            // Replace newlines with <br> tags so that the story summary is displayed correctly
+            response += `<p>Story Summary:<br>${storyNode.storySummary.replace(/\n/g, '<br>')}</p>`;
+        }
     }
     response += `</div>`;
     return response;
