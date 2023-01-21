@@ -14,6 +14,7 @@ export default class StoryNode {
 		this.prompts = prompts;
 		// Instantiate children node list with null values equal to the number of prompts
 		this.children = new Array(prompts.length).fill(null);
+		this.maxDepth = 1; // The maximum depth of the tree from this node
 		StoryNode.storyNodeList.push(this);
 	}
 
@@ -38,6 +39,21 @@ export default class StoryNode {
 		}
 		this.children[index] = child;
 		child.parent = this;
+		this.updateMaxDepth();
+	}
+
+	updateMaxDepth() {
+		let maxDepth = 1;
+		for (const child of this.children) {
+			if (child) {
+				maxDepth = Math.max(maxDepth, child.maxDepth + 1);
+			}
+		}
+		this.maxDepth = maxDepth;
+
+		if (this.parent) {
+			this.parent.updateMaxDepth();
+		}
 	}
 
 	// Takes the story node and the index of the prompt that was selected to create a new story using aiGeneration

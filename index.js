@@ -53,7 +53,8 @@ function renderStoryNode(storyNode) {
     response += `<p>${storyNode.story}</p>`;
     storyNode.prompts.forEach((prompt, index) => {
         if (storyNode.children[index]) {
-            response += `<a href="/story/${storyNode.children[index].id}">${prompt}</a><br>`;
+            // If the prompt has a corresponding child, link to the child, and display the max depth for that child
+            response += `<a href="/story/${storyNode.children[index].id}">${prompt} (depth: ${storyNode.children[index].maxDepth})</a><br>`;
         } else {
             // If the prompt does not have a corresponding child, link to a route that will create a story node with a new story and prompts. Mark the prompt to inform the user that this has not yet been generated
             response += `<a href="/story/${storyNode.id}/${index}">${prompt} (not yet generated)</a><br>`;
