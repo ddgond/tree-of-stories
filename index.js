@@ -7,7 +7,7 @@ dotenv.config();
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 const port = process.env.PORT;
-const debugging = process.env.DEBUGGING;
+const debugging = process.env.DEBUGGING === 'true';
 
 const generationQueue = [];
 
