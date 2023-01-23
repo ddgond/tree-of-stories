@@ -211,7 +211,7 @@ app.get(`${process.env.STORY_DELETION_SLUG}/:id`, speedLimiter, (req, res) => {
     const storyNodeId = req.params.id;
     const storyNode = StoryNode.findStory(storyNodeId);
     if (storyNode) {
-        res.send(`${storyNode.title} deleted`);
+        res.send(`${storyNode.title} deleted. <a href="/">Go home.</a>`);
         storyNode.delete();
     }
 });
