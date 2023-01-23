@@ -83,6 +83,14 @@ function renderSubmissionPage() {
     return response;
 }
 
+function renderMessage(message, title="Tree of Stories") {
+    let response = generatePageHead(title);
+    response += `<div class="container">`;
+    response += `<p>${message}</p>`;
+    response += `</div>`;
+    return response;
+}
+
 // Render the story's parents as a breadcrumb recursively
 function renderStoryNodeParentsBreadcrumbs(storyNode) {
     let response = '';
@@ -211,10 +219,10 @@ app.get(`${process.env.STORY_DELETION_SLUG}/:id`, speedLimiter, (req, res) => {
     const storyNodeId = req.params.id;
     const storyNode = StoryNode.findStory(storyNodeId);
     if (storyNode) {
-        res.send(`${storyNode.title} deleted. <a href="/">Go home.</a>`);
+        res.send(renderMessage(`${storyNode.title} deleted. <a href="/">Go home.</a>`, 'Story Deletion Page'));
         storyNode.delete();
     } else {
-        res.send(`Story with id '${storyNodeId}' does not exist. <a href="/">Go home.</a>`);
+        res.send(renderMessage(`Story with id '${storyNodeId}' does not exist. <a href="/">Go home.</a>`, 'Story Deletion Page'));
     }
 });
 
