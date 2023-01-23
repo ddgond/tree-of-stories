@@ -1,6 +1,8 @@
 import express from 'express';
 import StoryNode from './StoryNode.js';
 import dotenv from 'dotenv';
+import StoryTree from './StoryTree.js';
+import {hashString} from "./utilities.js";
 
 dotenv.config();
 
@@ -12,8 +14,7 @@ const debugging = process.env.DEBUGGING === 'true';
 const generationQueue = [];
 
 // Create the initial StoryNode, which acts as a menu for selecting different stories
-const initialStoryNode = new StoryNode('Welcome to the AI CYOA storyteller. Please select a story to begin.', 'Home', ['Land of a Thousand Suns', 'Boston Nights', 'The Last Dance', 'Time Keeper', 'Journey to Atlantis', 'Kitchen Mayhem']);
-initialStoryNode.storySummary = initialStoryNode.story;
+const storyRoot = StoryTree.load();
 
 // Generate the stylesheet for the page
 // Center the page's contents in a container
@@ -23,11 +24,35 @@ function generatePageCssTag() {
             display: flex;
             justify-content: center;
         }
+        a:hover {
+            color: orange;
+        }
         .container {
             /* do not do this, it is not responsive on mobile: width: 50%; */
             width: 100%;
             max-width: 800px;
             padding: 10px;
+        }
+        .parentBreadcrumbs {
+            font-size: 0.8em;
+        }
+        .parentStoryContents {
+        
+        }
+        .parentStoryContentsButton {
+            cursor: pointer;
+            background-color: #eee;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .parentStoryContentsButton:hover {
+            background-color: #ddd;
+        }
+        .parentStoryContentsButton:active {
+            background-color: #ccc;
+        }
+        .hidden {
+            display: none;
         }
     </style>`;
 }
@@ -43,18 +68,55 @@ function renderSubmissionPage() {
     return response;
 }
 
+// Render the story's parents as a breadcrumb recursively
+function renderStoryNodeParentsBreadcrumbs(storyNode) {
+    let response = '';
+    if (storyNode.parent) {
+        response += renderStoryNodeParentsBreadcrumbs(storyNode.parent);
+        response += `<a href="/story/${storyNode.parent.id}">${storyNode.parent.title}</a> -> `;
+    }
+    return response;
+}
+
+// Render the story's parents' contents recursively
+function renderStoryNodeParentsContents(storyNode) {
+    let response = '';
+    if (storyNode.parent && storyNode.parent !== storyRoot) {
+        response += renderStoryNodeParentsContents(storyNode.parent);
+        response += `<h2>> ${storyNode.parent.title}</h2>`;
+        response += `<p>${storyNode.parent.story}</p>`;
+    }
+    return response;
+}
+
 // Create a response string with the story and a link for each prompt (if the prompt has a corresponding child), as well as a link to the parent node
 // If the prompt does not have a corresponding child, link to a route that will create a story node with a new story and prompts
 // Finally, separate from the rest of the contents, link back to the home page
 function renderStoryNode(storyNode) {
     let response = generatePageCssTag();
     response += `<div class="container">`;
-    response += `<h1>${storyNode.title}</h1>`;
+    response += `<div class="parentBreadcrumbs">`
+    response += renderStoryNodeParentsBreadcrumbs(storyNode);
+    response += `</div>`;
+    response += `<div class="parentStoryContents hidden">`
+    response += `<p><span class="parentStoryContentsButton">Toggle story so far</span></p>`
+    response += renderStoryNodeParentsContents(storyNode);
+    response += `</div>`;
+    if (storyNode !== storyRoot && storyNode.parent !== storyRoot) {
+        response += `<p><span class="parentStoryContentsButton">Toggle story so far</span></p>`
+    }
+    response += `<script>
+      document.querySelectorAll('.parentStoryContentsButton').forEach(button => button.addEventListener('click', () => {
+        document.querySelector('.parentStoryContents').classList.toggle('hidden');
+      }));
+    </script>`;
+    response += `<h1>> ${storyNode.title}</h1>`;
     response += `<p>${storyNode.story}</p>`;
     storyNode.prompts.forEach((prompt, index) => {
         if (storyNode.children[index]) {
-            // If the prompt has a corresponding child, link to the child, and display the max depth for that child
-            response += `<a href="/story/${storyNode.children[index].id}">${prompt} (depth: ${storyNode.children[index].maxDepth})</a><br>`;
+            const node = storyNode.children[index];
+            // If the prompt has a corresponding child, link to the child, and display useful metadata
+            response += `<a href="/story/${storyNode.children[index].id}">${prompt} (${node.totalWordCount} words, depth: ${node.maxDepth} entries)</a><br>`;
         } else {
             // If the prompt does not have a corresponding child, link to a route that will create a story node with a new story and prompts. Mark the prompt to inform the user that this has not yet been generated
             response += `<a href="/story/${storyNode.id}/${index}">${prompt} (not yet generated)</a><br>`;
@@ -64,7 +126,7 @@ function renderStoryNode(storyNode) {
         response += `<a href="/story/${storyNode.parent.id}">Go back</a>`;
     }
     // Only link the home page if this is not the home page
-    if (storyNode !== initialStoryNode) {
+    if (storyNode !== storyRoot) {
         response += `<br><a href="/">Go home</a>`;
     }
     // Add a debugging section at the bottom that shows the id of the story node and the story summary if it exists
@@ -109,7 +171,7 @@ app.get(`${process.env.STORY_SUBMISSION_SLUG}`, (req, res) => {
 // This route is used to add a new prompt to the home page
 app.post(`${process.env.STORY_SUBMISSION_SLUG}`, (req, res) => {
     // Add the new prompt to the home page
-    initialStoryNode.addPrompt(req.body.prompt);
+    storyRoot.addPrompt(req.body.prompt);
     // Redirect to the home page
     res.redirect('/');
 });
@@ -161,7 +223,7 @@ app.get('/story/:id/:index', (req, res) => {
 
 // Create a route for the home page which renders the initial story node
 app.get('/', (req, res) => {
-    res.send(renderStoryNode(initialStoryNode));
+    res.send(renderStoryNode(storyRoot));
 });
 
 // Create a 404 route that links back to the home page
@@ -173,3 +235,15 @@ app.get('*', (req, res) => {
 app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
 });
+
+let lastSavedRootHash = null;
+setInterval(() => {
+    if (lastSavedRootHash === hashString(JSON.stringify(storyRoot.toJson()))) {
+        return;
+    }
+    lastSavedRootHash = hashString(JSON.stringify(storyRoot.toJson()));
+    StoryTree.save(storyRoot).then(() => {
+    }).catch((error) => {
+        console.error(error);
+    });
+}, 10000);

@@ -1,20 +1,23 @@
 // A standard Tree node that contains a story, a title, a pointer to its parent node (if it exists),
 // and a list of prompts for continuing the story along child nodes. These child nodes are only created once a user
 // has selected a prompt to continue the story.
-import { generateRandomId } from "./utilities.js";
+import {generateRandomId, wordCount} from "./utilities.js";
 import AiGeneration from "./AiGeneration.js";
 
 export default class StoryNode {
 	constructor(story, title, prompts) {
+		this.id = generateRandomId()
 		this.story = story;
 		this.title = title;
-		this.id = generateRandomId()
-		this.parent = null;
-		this.storySummary = null; // This is a summary of the story so far, including details from the parent nodes. This is only generated when the first child is created for efficiency.
 		this.prompts = prompts;
+		this.storySummary = null; // This is a summary of the story so far, including details from the parent nodes. This is only generated when the first child is created for efficiency.
+		this.parent = null;
 		// Instantiate children node list with null values equal to the number of prompts
 		this.children = new Array(prompts.length).fill(null);
 		this.maxDepth = 1; // The maximum depth of the tree from this node
+		this.totalChildren = 0; // The total number of children in the tree from this node
+		this.wordCount = wordCount(story); // The number of words in this node's story
+		this.childrenWordCount = 0; // The total number of words in the tree from this node (not including the title)
 		StoryNode.storyNodeList.push(this);
 	}
 
@@ -22,6 +25,39 @@ export default class StoryNode {
 
 	static findStory(id) {
 		return StoryNode.storyNodeList.find((storyNode) => storyNode.id === id);
+	}
+
+	static fromJson(json) {
+		const storyNode = new StoryNode(json.story, json.title, json.prompts);
+		storyNode.id = json.id;
+		storyNode.storySummary = json.storySummary;
+		json.children.forEach((child, index) => {
+			if (child) {
+				storyNode.setChild(index, StoryNode.fromJson(child));
+			}
+		});
+		storyNode.maxDepth = json.maxDepth;
+		storyNode.totalChildren = json.totalChildren;
+		storyNode.childrenWordCount = json.childrenWordCount;
+		return storyNode;
+	}
+
+	toJson() {
+		return {
+			id: this.id,
+			story: this.story,
+			title: this.title,
+			prompts: this.prompts,
+			storySummary: this.storySummary,
+			children: this.children.map((child) => child ? child.toJson() : null),
+			maxDepth: this.maxDepth,
+			totalChildren: this.totalChildren,
+			childrenWordCount: this.childrenWordCount,
+		};
+	}
+
+	get totalWordCount() {
+		return this.wordCount + this.childrenWordCount;
 	}
 
 	addPrompt(prompt) {
@@ -39,20 +75,26 @@ export default class StoryNode {
 		}
 		this.children[index] = child;
 		child.parent = this;
-		this.updateMaxDepth();
+		this.updateTreeData();
 	}
 
-	updateMaxDepth() {
+	updateTreeData() {
 		let maxDepth = 1;
+		let totalChildren = 0;
+		let childrenWordCount = 0;
 		for (const child of this.children) {
 			if (child) {
 				maxDepth = Math.max(maxDepth, child.maxDepth + 1);
+				totalChildren += 1 + child.totalChildren;
+				childrenWordCount += child.wordCount + child.childrenWordCount;
 			}
 		}
 		this.maxDepth = maxDepth;
+		this.totalChildren = totalChildren;
+		this.childrenWordCount = childrenWordCount;
 
 		if (this.parent) {
-			this.parent.updateMaxDepth();
+			this.parent.updateTreeData();
 		}
 	}
 
