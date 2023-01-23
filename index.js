@@ -24,9 +24,6 @@ function generatePageCssTag() {
             display: flex;
             justify-content: center;
         }
-        a:hover {
-            color: orange;
-        }
         .container {
             /* do not do this, it is not responsive on mobile: width: 50%; */
             width: 100%;
@@ -112,6 +109,7 @@ function renderStoryNode(storyNode) {
     </script>`;
     response += `<h1>> ${storyNode.title}</h1>`;
     response += `<p>${storyNode.story}</p>`;
+    response += `<div class="prompts">`;
     storyNode.prompts.forEach((prompt, index) => {
         if (storyNode.children[index]) {
             const node = storyNode.children[index];
@@ -122,6 +120,20 @@ function renderStoryNode(storyNode) {
             response += `<a href="/story/${storyNode.id}/${index}">${prompt} (not yet generated)</a><br>`;
         }
     });
+    response += `</div>`;
+    response += `<script>
+      document.querySelectorAll('.prompts a').forEach(link => link.addEventListener('click', e => {
+        // Do not override behavior if link is to a story that has already been generated
+        if (!link.innerText.includes('not yet generated')) {
+          return;
+        }
+        e.preventDefault();
+        link.innerText = 'Generating (please wait)...'
+        setTimeout(() => {
+          window.location = link.href;
+        }, 100);
+      }));
+    </script>`;
     if (storyNode.parent) {
         response += `<a href="/story/${storyNode.parent.id}">Go back</a>`;
     }
