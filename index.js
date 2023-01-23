@@ -213,6 +213,8 @@ app.get(`${process.env.STORY_DELETION_SLUG}/:id`, speedLimiter, (req, res) => {
     if (storyNode) {
         res.send(`${storyNode.title} deleted. <a href="/">Go home.</a>`);
         storyNode.delete();
+    } else {
+        res.send(`Story with id '${storyNodeId}' does not exist. <a href="/">Go home.</a>`);
     }
 });
 
