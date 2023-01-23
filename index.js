@@ -232,14 +232,15 @@ app.get('/story/:id/:index', speedLimiter, (req, res) => {
                     res.send(renderStoryNode(storyNode.children[index]));
                 }
             }, 1000);
-            // If the story node is not generated after 10 seconds, return an error
+            // If the story node is not generated after 60 seconds, return an error
             setTimeout(() => {
                 clearInterval(interval);
                 res.send(render404());
-            }, 10000);
+            }, 60000);
             return;
         }
-        // Genetate a child for the story node with the matching id and the index of the prompt
+        // Generate a child for the story node with the matching id and the index of the prompt
+        generationQueue.push(`${storyNode.id}-${index}`);
         storyNode.generateChildFromSelection(index).then((newStoryNode) => {
             res.send(renderStoryNode(newStoryNode));
         }).catch((error) => {
