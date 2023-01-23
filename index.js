@@ -206,6 +206,16 @@ app.post(`${process.env.STORY_SUBMISSION_SLUG}`, speedLimiter, (req, res) => {
     res.redirect('/');
 });
 
+// Create a route that deletes a specific story node and all of its children
+app.get(`${process.env.STORY_DELETION_SLUG}/:id`, speedLimiter, (req, res) => {
+    const storyNodeId = req.params.id;
+    const storyNode = StoryNode.findStory(storyNodeId);
+    if (storyNode) {
+        res.send(`${storyNode.title} deleted`);
+        storyNode.delete();
+    }
+});
+
 // Create dynamic routes on /story/:id/:index that match the id of a StoryNode and the index of a prompt and generate a
 // new StoryNode with a new story and prompts as a child of the StoryNode with the matching id
 // Return an error if the StoryNode with the matching id does not exist or if the index is invalid
@@ -225,15 +235,19 @@ app.get('/story/:id/:index', speedLimiter, (req, res) => {
         }
         // Check if this story node child is already in the generation queue
         if (generationQueue.includes(`${storyNode.id}-${index}`)) {
+            let timeout;
             // Wait for the story node to be generated
             const interval = setInterval(() => {
                 if (storyNode.children[index]) {
                     clearInterval(interval);
                     res.send(renderStoryNode(storyNode.children[index]));
+                    if (timeout) {
+                        clearTimeout(timeout);
+                    }
                 }
             }, 1000);
             // If the story node is not generated after 60 seconds, return an error
-            setTimeout(() => {
+            timeout = setTimeout(() => {
                 clearInterval(interval);
                 res.send(render404());
             }, 60000);

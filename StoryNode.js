@@ -105,6 +105,20 @@ export default class StoryNode {
 		}
 	}
 
+	delete() {
+		if (this.parent) {
+			const index = this.parent.children.indexOf(this);
+			if (this.parent.parent === null) {
+				this.parent.prompts.splice(index, 1);
+				this.parent.children.splice(index, 1);
+			} else {
+				this.parent.children[index] = null;
+			}
+			this.parent.updateTreeData();
+		}
+		StoryNode.storyNodeList.splice(StoryNode.storyNodeList.indexOf(this), 1);
+	}
+
 	// Takes the story node and the index of the prompt that was selected to create a new story using aiGeneration
 	// Return the new story node
 	generateChildFromSelection(index) {

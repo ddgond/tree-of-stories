@@ -9,6 +9,7 @@ Idea very much inspired by Gwern Branwen's [Choose-Your-Own-Adventure AI Dungeon
 ```
 OPENAI_API_KEY="YOUR_API_KEY"
 STORY_SUBMISSION_SLUG="/slugAtWhichToAllowStorySubmissions"
+STORY_DELETION_SLUG="/slugAtWhichToAllowStoryDeletions"
 PORT=PORT_TO_RUN_SERVER_ON
 DEBUGGING=TRUE_OR_FALSE (set to true to enable debugging mode in browser)
 ```
