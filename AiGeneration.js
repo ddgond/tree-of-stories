@@ -83,7 +83,7 @@ function updateSummary(previousSummary, story) {
 
 // Uses the OpenAI API to generate prompt options from the story
 function promptOptions(story, summary) {
-	const input = `The story so far:\n\n${summary}\n${story}\n\nGenerate four text-adventure-style options on how to continue:\n\n1)`;
+	const input = `The story so far:\n\n${summary}\n${story}\n\nGenerate five text-adventure-style options on how to continue:\n\n1)`;
 	return text(input, 256).then((response) => {
 		response = `1) ${response}`;
 		/*
@@ -92,6 +92,7 @@ function promptOptions(story, summary) {
 		 * 2) <option 2>
 		 * 3) <option 3>
 		 * 4) <option 4>
+		 * 5) <option 5>
 		 */
 		// Split the response into an array of options
 		const options = response.split(/\d\)/);

@@ -1,6 +1,9 @@
 # tree-of-stories
 An AI-powered CYOA storyteller.
+
 Built with OpenAI GPT-3.
+
+Idea very much inspired by Gwern Branwen's [Choose-Your-Own-Adventure AI Dungeon Games](https://gwern.net/CYOA).
 
 # .env file format
 ```

@@ -27,7 +27,7 @@ function load() {
     const defaultInitialStoryNode = new StoryNode(
       'Welcome to the AI CYOA storyteller. Please select a story to begin.',
       'Home',
-      ['Land of a Thousand Suns', 'Boston Nights', 'The Last Dance', 'Time Keeper', 'Journey to Atlantis', 'Kitchen Mayhem']);
+      []);
     defaultInitialStoryNode.storySummary = defaultInitialStoryNode.story;
     return defaultInitialStoryNode;
   }

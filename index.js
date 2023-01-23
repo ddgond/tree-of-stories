@@ -3,11 +3,17 @@ import StoryNode from './StoryNode.js';
 import dotenv from 'dotenv';
 import StoryTree from './StoryTree.js';
 import {hashString} from "./utilities.js";
+import slowDown from 'express-slow-down';
 
 dotenv.config();
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
+const speedLimiter = slowDown({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    delayAfter: 6 * 15, // allow 6 * 15 requests per 15 minutes, then...
+    delayMs: 5000 // begin adding 5000ms of delay per request above 100:
+});
 const port = process.env.PORT;
 const debugging = process.env.DEBUGGING === 'true';
 
@@ -15,6 +21,18 @@ const generationQueue = [];
 
 // Create the initial StoryNode, which acts as a menu for selecting different stories
 const storyRoot = StoryTree.load();
+
+// Generate the head element for the page
+function generatePageHead(title) {
+    return `
+        <head>
+            <title>${title}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+            ${generatePageCssTag()}
+        </head>
+    `;
+}
 
 // Generate the stylesheet for the page
 // Center the page's contents in a container
@@ -55,7 +73,7 @@ function generatePageCssTag() {
 }
 
 function renderSubmissionPage() {
-    let response = generatePageCssTag();
+    let response = generatePageHead('Story Submission Page');
     response += `<div class="container">`;
     response += `<form action="${process.env.STORY_SUBMISSION_SLUG}" method="post">
         <input type="text" name="prompt" placeholder="Enter a new story prompt">
@@ -90,7 +108,7 @@ function renderStoryNodeParentsContents(storyNode) {
 // If the prompt does not have a corresponding child, link to a route that will create a story node with a new story and prompts
 // Finally, separate from the rest of the contents, link back to the home page
 function renderStoryNode(storyNode) {
-    let response = generatePageCssTag();
+    let response = generatePageHead(`${storyNode.storyTitle} - ${storyNode.title}`);
     response += `<div class="container">`;
     response += `<div class="parentBreadcrumbs">`
     response += renderStoryNodeParentsBreadcrumbs(storyNode);
@@ -155,7 +173,7 @@ function renderStoryNode(storyNode) {
 }
 
 function render404() {
-    let response = generatePageCssTag();
+    let response = generatePageHead('404: Page not found');
     response += `<div class="container">`;
     response += `<h1>404: Page not found</h1>`;
     response += `<a href="/">Go home</a>`;
@@ -181,7 +199,7 @@ app.get(`${process.env.STORY_SUBMISSION_SLUG}`, (req, res) => {
 
 // Create a route that handles POST requests to generate new stories
 // This route is used to add a new prompt to the home page
-app.post(`${process.env.STORY_SUBMISSION_SLUG}`, (req, res) => {
+app.post(`${process.env.STORY_SUBMISSION_SLUG}`, speedLimiter, (req, res) => {
     // Add the new prompt to the home page
     storyRoot.addPrompt(req.body.prompt);
     // Redirect to the home page
@@ -191,7 +209,7 @@ app.post(`${process.env.STORY_SUBMISSION_SLUG}`, (req, res) => {
 // Create dynamic routes on /story/:id/:index that match the id of a StoryNode and the index of a prompt and generate a
 // new StoryNode with a new story and prompts as a child of the StoryNode with the matching id
 // Return an error if the StoryNode with the matching id does not exist or if the index is invalid
-app.get('/story/:id/:index', (req, res) => {
+app.get('/story/:id/:index', speedLimiter, (req, res) => {
     const storyNodeId = req.params.id;
     const storyNode = StoryNode.findStory(storyNodeId);
     if (storyNode) {

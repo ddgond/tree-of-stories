@@ -60,6 +60,13 @@ export default class StoryNode {
 		return this.wordCount + this.childrenWordCount;
 	}
 
+	get storyTitle() {
+		if (this.parent === null || this.parent.parent === null) {
+			return this.title;
+		}
+		return this.parent.storyTitle;
+	}
+
 	addPrompt(prompt) {
 		this.prompts.push(prompt);
 		this.children.push(null);
