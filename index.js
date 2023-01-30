@@ -266,6 +266,7 @@ app.get('/story/:id/:index', speedLimiter, (req, res) => {
         // Generate a child for the story node with the matching id and the index of the prompt
         generationQueue.push(`${storyNode.id}-${index}`);
         storyNode.generateChildFromSelection(index).then((newStoryNode) => {
+            generationQueue.splice(generationQueue.indexOf(`${storyNode.id}-${index}`), 1);
             res.send(renderStoryNode(newStoryNode));
         }).catch((error) => {
             console.error(error);
