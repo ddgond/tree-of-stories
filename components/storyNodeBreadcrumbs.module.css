@@ -1,0 +1,27 @@
+.breadcrumbs {
+    font-size: 0.65em;
+    border-top: 1px solid #ccc;
+    padding-top: 2em;
+    margin-top: 2em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+}
+
+.breadcrumb {
+    color: #000;
+    text-decoration: none;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: #eee;
+    display: inline-block;
+}
+
+.breadcrumb:hover {
+    background-color: #ddd;
+}
+
+.breadcrumb.active {
+    background-color: #ccc;
+}

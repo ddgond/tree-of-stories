@@ -1,0 +1,35 @@
+.history {
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #eee;
+}
+
+.history .toggleHistoryButton {
+    background-color: #eee;
+}
+
+.history .toggleHistoryButton:hover {
+    background-color: #ccc;
+}
+
+.history .toggleHistoryButton:active {
+    background-color: #bbb;
+}
+
+.toggleHistoryButton {
+    font-size: 0.75em;
+    cursor: pointer;
+    background-color: #eee;
+    padding: 0.5em;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    user-select: none;
+}
+.toggleHistoryButton:hover {
+    background-color: #ddd;
+}
+.toggleHistoryButton:active {
+    background-color: #ccc;
+}
