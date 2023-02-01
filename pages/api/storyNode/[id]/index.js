@@ -1,3 +1,5 @@
+// Ensure storyRoot is loaded before any requests are processed
+import {storyRoot} from "../../../../lib/main";
 import StoryNode from "../../../../lib/StoryNode.js";
 
 function getById(req, res) {

@@ -1,18 +1,27 @@
 .storyNode {
     padding: 20px 0;
-    margin: 20px 0;
+    margin: 0 0 20px 0;
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
 }
 
 .storyNode h1 {
-    margin: 0 0 20px 0;
+    color: #333;
+}
+
+.storyNode h1, .storyNode h2 {
+    margin: 0 0 0.2em 0;
     padding: 0;
     font-weight: 700;
-    color: #333;
 }
 
 .storyNode p {
     margin: 0;
     padding: 0;
+    line-height: 1.3em;
+}
+
+.subtitle {
+    color: #999;
+    text-align: center;
 }

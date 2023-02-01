@@ -16,12 +16,14 @@ export default function StoryNodeHistory({storyNode}) {
         <p>
             <span className={`${styles.toggleHistoryButton} sans-serif`} onClick={() => setOpen(false)}>Hide History</span>
         </p>
-        {history.map((storyNode) =>
-            <div key={storyNode.id}>
-                <h2>{storyNode.title}</h2>
-                <p>{storyNode.story}</p>
-            </div>
-        )}
+        <div className={styles.storyNodes}>
+            {history.map((storyNode, index) =>
+                <div className={styles.storyNode} key={storyNode.id}>
+                    <h2>{storyNode.title} <span className={styles.subtitle}>Part {index+1} of {history.length}</span></h2>
+                    <p>{storyNode.story}</p>
+                </div>
+            )}
+        </div>
         <p>
             <span className={`${styles.toggleHistoryButton} sans-serif`} onClick={() => setOpen(false)}>Hide History</span>
         </p>

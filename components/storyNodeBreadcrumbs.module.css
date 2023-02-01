@@ -1,11 +1,12 @@
 .breadcrumbs {
-    font-size: 0.65em;
+    font-size: 0.7em;
     border-top: 1px solid #ccc;
     padding-top: 2em;
     margin-top: 2em;
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
-    gap: 0.5em;
+    align-items: flex-start;
 }
 
 .breadcrumb {
@@ -13,9 +14,10 @@
     text-decoration: none;
     padding: 0.5em;
     border: 1px solid #ccc;
+    border-bottom: 2px solid #ccc;
     border-radius: 3px;
-    background-color: #eee;
     display: inline-block;
+    margin-bottom: 0.5em;
 }
 
 .breadcrumb:hover {
@@ -24,4 +26,10 @@
 
 .breadcrumb.active {
     background-color: #ccc;
+}
+
+.subtitle {
+    color: #999;
+    padding-right: 0.25em;
+    border-right: 1px solid #ccc;
 }
