@@ -28,6 +28,10 @@ function deleteById(req, res) {
         res.status(404).send();
         return;
     }
+    if (storyNode === storyRoot) {
+        res.status(400).send();
+        return;
+    }
     storyNode.delete();
     res.status(200).send();
 }
