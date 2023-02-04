@@ -1,11 +1,11 @@
 import Head from 'next/head';
-import StoryNode from "../../components/storyNode.js";
-import StoryNodeBreadcrumbs from "../../components/storyNodeBreadcrumbs.js";
+import StoryNode from "../../../components/storyNode.js";
+import StoryNodeBreadcrumbs from "../../../components/storyNodeBreadcrumbs.js";
 import { useRouter } from 'next/router'
-import { useFetch } from "../../lib/browserUtilities.js";
+import { useFetch } from "../../../lib/browserUtilities.js";
 import Link from "next/link.js";
-import StoryNodePrompts from "../../components/storyNodePrompts.js";
-import StoryNodeHistory from "../../components/storyNodeHistory.js";
+import StoryNodePrompts from "../../../components/storyNodePrompts.js";
+import StoryNodeHistory from "../../../components/storyNodeHistory.js";
 
 export default function StoryNodePage() {
     const router = useRouter();

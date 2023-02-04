@@ -2,7 +2,7 @@ import Head from 'next/head';
 import {router} from "next/router";
 import {useState} from "react";
 import {postSubmit} from "../lib/browserUtilities.js";
-import styles from "./submit.module.css";
+import styles from "./admin.module.css";
 
 export default function Submit() {
     const [error, setError] = useState(null);
@@ -28,10 +28,10 @@ export default function Submit() {
     return (
         <div>
             <Head>
-                <title>Submit A New Story</title>
+                <title>Submit a New Story</title>
             </Head>
             <main>
-                <h1>Submit A New Story</h1>
+                <h1>Submit a New Story</h1>
                 <div>
                     <h2>Submission Form</h2>
                     <form className={styles.form} onSubmit={handleSubmit}>
