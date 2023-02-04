@@ -1,13 +1,14 @@
 import Head from 'next/head';
 import {router, useRouter} from "next/router";
 import {useState} from "react";
-import {deleteSubmit} from "../../../lib/browserUtilities.js";
+import {deleteSubmit, useFetch} from "../../../lib/browserUtilities.js";
 import styles from "../../admin.module.css";
 
 export default function Delete() {
   const router = useRouter();
   const { id } = router.query;
-  const [error, setError] = useState(null);
+  const [submitError, setError] = useState(null);
+  const { data: storyNode, fetchError, loading } = useFetch(`/api/storyNode/${id}`);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -19,10 +20,19 @@ export default function Delete() {
         setError(`${res.status}: ${res.statusText}`);
         return;
       }
-      router.push("/");
+      router.push(`/storyNode/${storyNode.parent.id}`);
     }).catch(error => {
       setError(error);
     });
+  }
+
+  if (loading) {
+    return <div>
+      <Head>
+        <title>Delete a Story</title>
+      </Head>
+      <div>loading...</div>
+    </div>;
   }
 
   return (
@@ -40,7 +50,10 @@ export default function Delete() {
           </form>
         </div>
         <div className={styles.error}>
-          {error && <div>{error}</div>}
+          {fetchError && <div>{fetchError}</div>}
+        </div>
+        <div className={styles.error}>
+          {submitError && <div>{submitError}</div>}
         </div>
       </main>
     </div>
