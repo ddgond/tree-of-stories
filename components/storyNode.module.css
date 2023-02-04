@@ -21,7 +21,24 @@
     line-height: 1.3em;
 }
 
-.subtitle {
+.subtitleBar {
     color: #999;
-    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.subtitle {
+    display: inline-block;
+}
+
+.backArrow {
+    color: #bbb;
+    margin-right: 0.2em;
+    font-size: 1.2em;
+}
+
+.backArrow:hover {
+    color: #999;
 }

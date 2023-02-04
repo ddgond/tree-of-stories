@@ -1,0 +1,16 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
+    padding: 0 1rem;
+}
+
+.form input:not(:last-child) {
+    margin-bottom: 1em;
+}
+
+.error {
+    color: red;
+}

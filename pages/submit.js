@@ -2,6 +2,7 @@ import Head from 'next/head';
 import {router} from "next/router";
 import {useState} from "react";
 import {postSubmit} from "../lib/browserUtilities.js";
+import styles from "./submit.module.css";
 
 export default function Submit() {
     const [error, setError] = useState(null);
@@ -10,6 +11,7 @@ export default function Submit() {
         event.preventDefault();
         const data = {
             prompt: event.target.prompt.value,
+            genre: event.target.genre.value.toLowerCase(),
             password: event.target.password.value
         };
         postSubmit("/api/storyNode", data).then(res => {
@@ -29,15 +31,28 @@ export default function Submit() {
                 <title>Submit A New Story</title>
             </Head>
             <main>
+                <h1>Submit A New Story</h1>
                 <div>
-                    <h1>Submit A New Story</h1>
-                    <form onSubmit={handleSubmit}>
+                    <h2>Submission Form</h2>
+                    <form className={styles.form} onSubmit={handleSubmit}>
                         <input type="text" name="prompt" placeholder="Enter a new story prompt"/>
+                        <input type="text" name="genre" placeholder="Enter a genre"/>
                         <input type="password" name="password" placeholder="Enter the password"/>
                         <input type="submit" value="Submit"/>
                     </form>
                 </div>
                 <div>
+                    <h2>Available Genres</h2>
+                    <ul>
+                        <li>Adventure</li>
+                        <li>Comedy</li>
+                        <li>Cyoa</li>
+                        <li>Drama</li>
+                        <li>Horror</li>
+                        <li>Romance</li>
+                    </ul>
+                </div>
+                <div className={styles.error}>
                     {error && <div>{error}</div>}
                 </div>
             </main>

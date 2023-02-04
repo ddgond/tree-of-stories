@@ -1,7 +1,8 @@
 import {storyRoot} from "../../../lib/main.js";
+import {generationQueue} from "../../../lib/main.js";
 
 function createStoryNode(req, res) {
-    const { prompt, password } = req.body;
+    const { prompt, genre, password } = req.body;
     if (!prompt) {
         res.status(400).send();
         return;
@@ -11,7 +12,15 @@ function createStoryNode(req, res) {
         return;
     }
     storyRoot.addPrompt(prompt);
-    res.status(200).send();
+    generationQueue.push(`${storyRoot.id} - ${storyRoot.prompts.length - 1}`);
+    storyRoot.generateChildFromSelection(storyRoot.prompts.length - 1, genre).then(() => {
+        res.status(200).send();
+    }).catch(error => {
+        console.error(error);
+        res.status(500).send();
+    }).finally(() => {
+        generationQueue.splice(generationQueue.indexOf(`${id} - ${index}`), 1);
+    });
 }
 
 export default function handler(req, res) {
