@@ -35,4 +35,6 @@ storyTree.json
 
 log.txt
 error_log.txt
+openai_log.txt
+stats_log.txt
 /archive/
